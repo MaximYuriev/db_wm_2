@@ -7,11 +7,4 @@ TITLE_INNER_ELEMENT_CLASS_NAME = "accordeon-inner__item-inner__title"
 
 SEARCHED_TEXT = "Единица измерения: Метрическая тонна"
 
-BULLETIN_HEADER_MAP = {
-    "Код\nИнструмента": "exchange_product_id",
-    "Наименование\nИнструмента": "exchange_product_name",
-    "Базис\nпоставки": "delivery_basis_name",
-    "Объем\nДоговоров\nв единицах\nизмерения": "volume",
-    "Обьем\nДоговоров,\nруб.": "total",
-    "Количество\nДоговоров,\nшт.": "count",
-}
+END_REPORT_FILE_ROW = ("Итого:", "Итого по секции:")

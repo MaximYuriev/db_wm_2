@@ -14,7 +14,7 @@ async def main():
 
     async with aiohttp.ClientSession() as session:
         parser = Parser(session)
-        df = await parser.get_df_from_parsed_website()
+        df = await parser.get_schemas_from_parsed_website()
 
     async with session_maker() as db_session:
         repository = BulletinRepository(db_session)

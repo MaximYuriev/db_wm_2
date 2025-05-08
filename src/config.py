@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 _BASE_DIR = Path(__file__).resolve().parent.parent
 _ENV_DIR = os.path.join(_BASE_DIR, '.env')
 
+
 class PostgresConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=_ENV_DIR,

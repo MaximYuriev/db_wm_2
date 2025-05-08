@@ -1,12 +1,9 @@
-from typing import Any, Generator
-
-from pandas.core.generic import NDFrame
+from typing import Generator
 
 from src.core.model import Bulletin
+from src.core.schema import BulletinSchema
 
-type DataFrame = NDFrame
 
-
-def covert_df_to_model_gen(df: DataFrame) -> Generator[Bulletin, None, None]:
-    for _, row in df.iterrows():
-        yield Bulletin.from_df_row(row)
+def covert_df_to_model_gen(bulletin_schemas_list: list[BulletinSchema]) -> Generator[Bulletin, None, None]:
+    for bulletin in bulletin_schemas_list:
+        yield bulletin.to_model()

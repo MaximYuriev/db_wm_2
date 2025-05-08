@@ -8,7 +8,7 @@ from src.core.constants import URL_FOR_PARSING, BASE_URL, CONTAINER_CLASS_NAME, 
     TITLE_INNER_ELEMENT_CLASS_NAME
 from src.core.exceptions import StopDateException
 from src.core.schema import BulletinSchema
-from src.core.utils.xls_worker import XLSWorker
+from src.core.utils.xls_worker import xls_to_schema_list
 
 type HTMLElement = PageElement | Tag | NavigableString
 type ParsingResult = ResultSet[HTMLElement]
@@ -25,8 +25,7 @@ class Parser:
 
         bulletin_schema_list = []
         for xls, date in xls_file_list:
-            xls_worker = XLSWorker(xls, date)
-            bulletin_schema_list.extend(xls_worker.xls_to_schema_list())
+            bulletin_schema_list.extend(xls_to_schema_list(xls, date))
 
         return bulletin_schema_list
 

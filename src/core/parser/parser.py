@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup, ResultSet, PageElement, Tag, NavigableString
 from src.core.constants import URL_FOR_PARSING, BASE_URL, CONTAINER_CLASS_NAME, INNER_ELEMENTS_CLASS_NAME, \
     TITLE_INNER_ELEMENT_CLASS_NAME
 from src.core.exceptions import StopDateException
-from src.core.schema import BulletinSchema
+from src.core.parser.schema import BulletinSchema
 from src.core.utils.xls_worker import xls_to_schema_list
 
 type HTMLElement = PageElement | Tag | NavigableString

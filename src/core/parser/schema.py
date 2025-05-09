@@ -2,7 +2,7 @@ import datetime
 
 from pydantic import BaseModel, field_validator
 
-from src.core.model import Bulletin
+from src.core.db.model import Bulletin
 
 
 class BulletinSchema(BaseModel):

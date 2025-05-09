@@ -6,7 +6,7 @@ from xlrd.sheet import Sheet
 
 from src.core.constants import END_REPORT_FILE_ROW, SEARCHED_TEXT
 from src.core.exceptions import TableNotFoundException
-from src.core.schema import BulletinSchema
+from src.core.parser.schema import BulletinSchema
 from src.core.utils.headers import BulletinHeaderEnum
 
 type xlsFile = BytesIO

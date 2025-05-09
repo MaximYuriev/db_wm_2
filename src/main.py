@@ -3,9 +3,8 @@ import asyncio
 import aiohttp
 
 from src.config import config
-from src.core.db import get_async_engine, get_async_session_maker
-from src.core.parser import Parser
-from src.core.repository import BulletinRepository
+from src.core.db.db import get_async_engine, get_async_session_maker, save_bulletin_in_db
+from src.core.parser.parser import Parser
 
 
 async def main():
@@ -14,11 +13,10 @@ async def main():
 
     async with aiohttp.ClientSession() as session:
         parser = Parser(session)
-        df = await parser.get_schemas_from_parsed_website()
+        bulletin_schema_list = await parser.get_schemas_from_parsed_website()
 
     async with session_maker() as db_session:
-        repository = BulletinRepository(db_session)
-        await repository.add_bulletins_from_df(df)
+        await save_bulletin_in_db(session=db_session, bulletin_schema_list=bulletin_schema_list)
 
 
 if __name__ == "__main__":

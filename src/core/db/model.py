@@ -29,18 +29,3 @@ class Bulletin(Base):
     total: Mapped[int]
     count: Mapped[int]
     date: Mapped[date]
-
-    @classmethod
-    def from_df_row(cls, row: dict[str, str]) -> "Bulletin":
-        return cls(
-            exchange_product_id=row["exchange_product_id"],
-            exchange_product_name=row["exchange_product_name"],
-            oil_id=row["exchange_product_id"][:4],
-            delivery_basis_id=row["exchange_product_id"][4:7],
-            delivery_basis_name=row["delivery_basis_name"],
-            delivery_type_id=row["exchange_product_id"][-1],
-            volume=int(row["volume"]),
-            total=int(row["total"]),
-            count=int(row["count"]),
-            date=row["date"],
-        )

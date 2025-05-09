@@ -16,11 +16,11 @@ async def save_bulletin_in_db(session: AsyncSession, bulletin_schema_list: list[
     model_list = []
 
     for model in model_gen:
-        if len(model_list) == 500:
+        model_list.append(model)
+
+        if len(model_list) >= 500:
             session.add_all(model_list)
             model_list.clear()
-        else:
-            model_list.append(model)
 
     if len(model_list) != 0:
         session.add_all(model_list)

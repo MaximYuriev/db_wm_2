@@ -7,8 +7,7 @@ from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 
 from src.core.constants import BASE_URL, FIRST_PAGE, LAST_PAGE, URL_FOR_PARSING, STOP_YEAR, CONTAINER_CLASS_NAME, \
-    INNER_ELEMENTS_CLASS_NAME, TITLE_INNER_ELEMENT_CLASS_NAME
-from src.core.exceptions import PageNotLoadedException, FileNotLoadedException
+    INNER_ELEMENTS_CLASS_NAME, TITLE_INNER_ELEMENT_CLASS_NAME, MAX_REQUEST_RETRIES
 from src.core.parser.schema import BulletinSchema
 from src.core.utils.xls_worker import xls_to_schema_list
 
@@ -41,23 +40,29 @@ async def _get_fetch_files_tasks(session: ClientSession) -> list[Task]:
     for page_number in range(FIRST_PAGE, LAST_PAGE):
         url = f"{URL_FOR_PARSING}{str(page_number)}"
         page = await _get_page(session, url)
-        xls_file_link_w_bulletin_date = _get_xls_files_download_links_w_bulletin_date(page)
+        if page is not None:
+            xls_file_link_w_bulletin_date = _get_xls_files_download_links_w_bulletin_date(page)
 
-        for link, date in xls_file_link_w_bulletin_date:
-            if date.year >= STOP_YEAR:
-                task = asyncio.create_task(_fetch_xls_file_w_bulletin_date_from_link(session, link, date))
-                fetch_files_tasks.append(task)
-            else:
-                return fetch_files_tasks
+            for link, date in xls_file_link_w_bulletin_date:
+                if date.year >= STOP_YEAR:
+                    task = asyncio.create_task(_fetch_xls_file_w_bulletin_date_from_link(session, link, date))
+                    fetch_files_tasks.append(task)
+                else:
+                    return fetch_files_tasks
 
     return fetch_files_tasks
 
 
-async def _get_page(session: ClientSession, url: str) -> Page:
-    response = await session.get(url)
-    if response.status == 200:
-        return await response.text()
-    raise PageNotLoadedException(url)
+async def _get_page(session: ClientSession, url: str) -> Page | None:
+    current_retries = 0
+    while current_retries < MAX_REQUEST_RETRIES:
+        response = await session.get(url)
+        if response.status == 200:
+            return await response.text()
+        else:
+            current_retries += 1
+            print(f"Попытка №{current_retries} выполнить запрос по адресу: {url}")
+    print(f"Запрос по адресу {url} завершился неудачно!")
 
 
 def _get_xls_files_download_links_w_bulletin_date(page: Page) -> list[tuple[xlsFileLink, BulletinDate]]:
@@ -84,9 +89,14 @@ async def _fetch_xls_file_w_bulletin_date_from_link(
         session: ClientSession,
         xls_file_link: xlsFileLink,
         bulletin_date: BulletinDate,
-) -> tuple[xlsFile, BulletinDate]:
-    file = await session.get(xls_file_link)
-    if file.status == 200:
-        xls_file = BytesIO(await file.read())
-        return xls_file, bulletin_date
-    raise FileNotLoadedException(xls_file_link)
+) -> tuple[xlsFile, BulletinDate] | None:
+    current_retries = 0
+    while current_retries < MAX_REQUEST_RETRIES:
+        file = await session.get(xls_file_link)
+        if file.status == 200:
+            xls_file = BytesIO(await file.read())
+            return xls_file, bulletin_date
+        else:
+            current_retries += 1
+            print(f"Попытка №{current_retries} скачать файл по адресу: {xls_file_link}")
+    print(f"Скачивание файла по адресу: {xls_file_link} завершилось неудачно!")

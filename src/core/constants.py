@@ -9,9 +9,6 @@ SEARCHED_TEXT = "Единица измерения: Метрическая то�
 
 END_REPORT_FILE_ROW = ("Итого:", "Итого по секции:")
 
-FIRST_PAGE = 1
-LAST_PAGE = 389
-
 STOP_YEAR = 2023
 
 MAX_REQUEST_RETRIES = 2

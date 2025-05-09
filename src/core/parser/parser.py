@@ -6,8 +6,9 @@ from io import BytesIO
 from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 
-from src.core.constants import BASE_URL, FIRST_PAGE, LAST_PAGE, URL_FOR_PARSING, STOP_YEAR, CONTAINER_CLASS_NAME, \
+from src.core.constants import BASE_URL, URL_FOR_PARSING, STOP_YEAR, CONTAINER_CLASS_NAME, \
     INNER_ELEMENTS_CLASS_NAME, TITLE_INNER_ELEMENT_CLASS_NAME, MAX_REQUEST_RETRIES
+from src.core.exceptions import UnableDefineSearchBoundariesException
 from src.core.parser.schema import BulletinSchema
 from src.core.utils.xls_worker import xls_to_schema_list
 
@@ -15,6 +16,8 @@ type xlsFileLink = str
 type xlsFile = BytesIO
 type BulletinDate = datetime.date
 type Page = str
+type FirstPage = int
+type LastPage = int
 
 
 async def get_bulletin_schema_from_parsed_website(session: ClientSession) -> list[BulletinSchema]:
@@ -36,8 +39,8 @@ async def _get_list_w_xls_file_and_bulletin_date(session: ClientSession) -> list
 
 async def _get_fetch_files_tasks(session: ClientSession) -> list[Task]:
     fetch_files_tasks = []
-
-    for page_number in range(FIRST_PAGE, LAST_PAGE):
+    first_page, last_page = await _get_search_boundary(session)
+    for page_number in range(first_page, last_page):
         url = f"{URL_FOR_PARSING}{str(page_number)}"
         page = await _get_page(session, url)
         if page is not None:
@@ -51,6 +54,26 @@ async def _get_fetch_files_tasks(session: ClientSession) -> list[Task]:
                     return fetch_files_tasks
 
     return fetch_files_tasks
+
+
+async def _get_search_boundary(session: ClientSession) -> tuple[FirstPage, LastPage]:
+    url = URL_FOR_PARSING
+
+    current_retries = 0
+    while current_retries < MAX_REQUEST_RETRIES:
+        response = await session.get(url)
+        if response.status == 200:
+            return _get_first_and_last_pages(await response.text())
+        else:
+            current_retries += 1
+    raise UnableDefineSearchBoundariesException
+
+
+def _get_first_and_last_pages(page: Page) -> tuple[FirstPage, LastPage]:
+    soup = BeautifulSoup(page, 'html.parser')
+    container = soup.find('div', class_='bx-pagination-container')
+    elements = container.find_all('span')
+    return int(elements[1].text), int(elements[-2].text)
 
 
 async def _get_page(session: ClientSession, url: str) -> Page | None:

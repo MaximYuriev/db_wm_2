@@ -10,19 +10,27 @@ class ParserException(Exception):
 
 
 @dataclass(frozen=True, eq=False)
-class StopDateException(ParserException):
-    current_date: datetime.date
-    stop_date: datetime.date
-
-    @property
-    def message(self) -> str:
-        return f"Текущая дата {self.current_date} меньше даты остановки поиска {self.stop_date}!"
-
-
-@dataclass(frozen=True, eq=False)
 class TableNotFoundException(ParserException):
     table_title: str
 
     @property
     def message(self) -> str:
         return f"Таблица с названием '{self.table_title}' не найдена!"
+
+
+@dataclass(frozen=True, eq=False)
+class PageNotLoadedException(ParserException):
+    url: str
+
+    @property
+    def message(self) -> str:
+        return f"Страница по адресу: '{self.url}' не загружена!"
+
+
+@dataclass(frozen=True, eq=False)
+class FileNotLoadedException(ParserException):
+    file_link: str
+
+    @property
+    def message(self) -> str:
+        return f"Файл не был загружен по ссылке: '{self.file_link}'!"

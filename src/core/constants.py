@@ -8,3 +8,8 @@ TITLE_INNER_ELEMENT_CLASS_NAME = "accordeon-inner__item-inner__title"
 SEARCHED_TEXT = "Единица измерения: Метрическая тонна"
 
 END_REPORT_FILE_ROW = ("Итого:", "Итого по секции:")
+
+FIRST_PAGE = 1
+LAST_PAGE = 389
+
+STOP_YEAR = 2023

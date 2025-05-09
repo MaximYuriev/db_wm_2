@@ -4,7 +4,7 @@ import aiohttp
 
 from src.config import config
 from src.core.db.db import get_async_engine, get_async_session_maker, save_bulletin_in_db
-from src.core.parser.parser import Parser
+from src.core.parser.parser import get_bulletin_schema_from_parsed_website
 
 
 async def main():
@@ -12,8 +12,7 @@ async def main():
     session_maker = get_async_session_maker(async_engine)
 
     async with aiohttp.ClientSession() as session:
-        parser = Parser(session)
-        bulletin_schema_list = await parser.get_schemas_from_parsed_website()
+        bulletin_schema_list = await get_bulletin_schema_from_parsed_website(session)
 
     async with session_maker() as db_session:
         await save_bulletin_in_db(session=db_session, bulletin_schema_list=bulletin_schema_list)

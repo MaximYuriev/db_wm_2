@@ -14,8 +14,7 @@ async def main():
     async with aiohttp.ClientSession() as session:
         bulletin_schema_list = await get_bulletin_schema_from_parsed_website(session)
 
-    async with session_maker() as db_session:
-        await save_bulletin_in_db(session=db_session, bulletin_schema_list=bulletin_schema_list)
+    await save_bulletin_in_db(session_maker=session_maker, bulletin_schema_list=bulletin_schema_list)
 
 
 if __name__ == "__main__":
